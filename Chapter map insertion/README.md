@@ -4,6 +4,8 @@ Insert chapter maps, map changes and map tileset.
 
 laqieer
 
+Importance: Export .tmx as .lua by Tiled!
+
 Commands to generate maps, map changes and map tileset data:
 
 grit 0.png -gB4 -mLf -gT000000 -m -mB16:p4vhi10 -mp0 -mR4 -mRtf -pn16 -ftb
@@ -17,3 +19,7 @@ copy /b 0.map.bin+1.map.bin+2.map.bin+3.map.bin+4.map.bin tileset.map.bin
 RearrangeTilemap
 lua mapConveter.lua
 copy /b tile.conf.bin+terrain.conf.bin tileset.conf.dmp
+
+blankMapConverter.lua:
+
+Use the map itself as the map tileset so that you don't need to map yourself. Leave the map layer blank.
