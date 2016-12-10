@@ -1,0 +1,7 @@
+//Fix a bug in Lyn w/Sol Katti animation
+//laqieer
+PUSH
+ORG 0xD60D84
+BYTE 0x8C
+//84=Durandal 8C=Sol Katti
+POP
