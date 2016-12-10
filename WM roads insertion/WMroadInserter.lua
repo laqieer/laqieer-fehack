@@ -3,9 +3,9 @@
 -- v1.1 Updated on 2016/06/26
 -- v1.2 Updated on 2016/11/27
 require "bit"
-route = dofile("route.lua")
+route = dofile("road.lua")
 for k=1, table.maxn(route["layers"]) do
-	local out = io.open("route"..tostring(k)..".bin","wb")
+	local out = io.open("road"..tostring(k)..".bin","wb")
 	for i=1,route["height"] do
 		for j=1,route["width"] do
 			if(route["layers"][k]["data"][(i-1) * route["width"] + j] ~= 0)
@@ -45,7 +45,7 @@ for k=1, table.maxn(route["layers"]) do
 	-- 新增路线行走信息数据生成功能
 	if(route["layers"][k]["properties"]["TurningNo"] ~= nil)
 	then
-		local out = io.open("walking"..tostring(k)..".bin","wb")
+		local out = io.open("walkingData"..tostring(k)..".bin","wb")
 		for i=1,route["layers"][k]["properties"]["TurningNo"] do
 			turnS = math.ceil(route["layers"][k]["properties"]["Turn"..tostring(i).."S"] * 4096 / 52)
 			out:write(string.char(bit.band(turnS,0xFF),bit.band(bit.rshift(turnS,8),0xFF),0x00,0x00))
