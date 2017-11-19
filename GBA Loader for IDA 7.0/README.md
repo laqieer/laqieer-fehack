@@ -1,0 +1,1 @@
+Modified from https://www.ff6hacking.com/misc/tutorials/IDA/nintendo_gba.zip, which can be loaded in IDA 6.8.
