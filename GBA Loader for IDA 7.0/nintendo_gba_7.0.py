@@ -44,6 +44,7 @@ def load_file(li, neflags, format):
 		Warning("Unknown format name: '%s'" % format)
     		return 0
 	idaapi.set_processor_type("arm", SETPROC_ALL|SETPROC_FATAL)
+	idaapi.set_target_assembler(1)  # set gas style
 	li.seek(0, idaapi.SEEK_END)
 	size = li.tell()
 
@@ -102,6 +103,8 @@ def load_file(li, neflags, format):
 	idc.ExtLinA(ROM_START, 10,  "; Reserved Area : db 2 dup(0)")
 	
 	io_naming()
+	DelFunction(0)  # delete sub_0
+	crt0_naming()   # mark Start Up Routine
 	print("[+] Load OK")
 	return 1
 
@@ -331,6 +334,11 @@ def io_naming():
 	MakeDword(0x04000800)
 	MakeNameEx(0x04000804, "Notused", SN_NOCHECK | SN_NOWARN)
 
+def crt0_naming():
+        MakeNameEx(0x08000000, "_start", SN_NOCHECK)
+        MakeCode(0x08000000)
+        MakeNameEx(0x08000004, "rom_header", SN_NOCHECK)
+        MakeNameEx(0x080000C0, "start_vector", SN_NOCHECK)
 
 def main():
 	return 0
