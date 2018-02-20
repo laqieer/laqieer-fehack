@@ -11,6 +11,7 @@ static main() {
 	if(!cfg)
 	{
 		Warning("Error when opening %s", cfgName);
+		return;
 	}
 	addr = 0;
 	for(addr = NextFunction(addr); addr != BADADDR; addr = NextFunction(addr))
