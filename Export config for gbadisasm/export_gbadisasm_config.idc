@@ -5,8 +5,9 @@
 #include <idc.idc>
 
 static main() {
-	auto cfg, cfgName, addr, cmt, isARM, name, armBoundary;	
-	armBoundary = LocByName("AgbMain");
+	// auto cfg, cfgName, addr, cmt, isARM, name, armBoundary;	
+	auto cfg, cfgName, addr, cmt, isThumb, name;
+	// armBoundary = LocByName("AgbMain");
 	cfgName = AskFile(1, "*.cfg", "export to");
 	cfg = fopen(cfgName, "w");
 	if(!cfg)
@@ -19,10 +20,12 @@ static main() {
 	{
 		name = Name(addr);
 		// isARM = (FindCode(addr, SEARCH_DOWN | SEARCH_NEXT) - addr -2) / 2;	// 可能出现误判，因为thumb函数里也会出现第一条指令距离下一个指令超过2字节的情形例如跳转语句或者伪指令(例如movs r1,#0x04000000, 其实是由2条指令构成的)，或者整个函数就一条"bx lr"指令(空函数)
-		isARM = addr < armBoundary ? 1 : 0; // 假定AgbMain是第一个thumb函数
+		// isARM = addr < armBoundary ? 1 : 0; // 假定AgbMain是第一个thumb函数
+		isThumb = GetReg(addr, "T");	// 取虚拟寄存器T的值来区分arm代码和thumb代码
 		cmt = GetFunctionCmt(addr, 1);
 		fprintf(cfg, "# %s\n", cmt);	// 只允许单行注释，写入配置文件的多行注释从第二行开始开头会缺少#
-		writestr(cfg, isARM? "arm_func": "thumb_func");
+		// writestr(cfg, isARM? "arm_func": "thumb_func");
+		writestr(cfg, isThumb? "thumb_func": "arm_func");
 		fprintf(cfg, " 0x%x %s\n", addr, name);
 	}
 	fclose(cfg);
