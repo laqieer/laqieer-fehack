@@ -23,8 +23,10 @@ static main() {
 		// isARM = addr < armBoundary ? 1 : 0; // 假定AgbMain是第一个thumb函数
 		isThumb = GetReg(addr, "T");	// 取虚拟寄存器T的值来区分arm代码和thumb代码
 		cmt = GetFunctionCmt(addr, 1);
-		if(cmt)
-			fprintf(cfg, "# %s\n", cmt);	// 只允许单行注释，写入配置文件的多行注释从第二行开始开头会缺少#
+		// if(cmt)
+			//fprintf(cfg, "# %s\n", cmt);	// 只允许单行注释，写入配置文件的多行注释从第二行开始开头会缺少#
+		if(cmt != "" && strstr(cmt, "\n") > 0)
+			fprintf(cfg, "# %s\n", substr(cmt, 0, strstr(cmt, "\n")));	// 多行注释只输出第一行注释
 		// writestr(cfg, isARM? "arm_func": "thumb_func");
 		writestr(cfg, isThumb? "thumb_func": "arm_func");
 		fprintf(cfg, " 0x%x %s\n", addr, name);
