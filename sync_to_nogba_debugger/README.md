@@ -24,3 +24,9 @@ Share IDA knowledge with NO$GBA and make debugging much easier.
 # Installation
 
 Copy. idc file into plugins folder in your IDA directory.
+
+# Usage
+
+Menu: Edit -> Plugins -> Sync to NO$GBA debugger
+Hotkey: Alt + 9
+Besides, it will synchronize automatically when closing IDA database.
