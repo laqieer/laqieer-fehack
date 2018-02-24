@@ -20,3 +20,7 @@ Share IDA knowledge with NO$GBA and make debugging much easier.
 ## Auto Code/Data recognization
 
 <img src="DataView.png">
+
+# Installation
+
+Copy. idc file into plugins folder in your IDA directory.
