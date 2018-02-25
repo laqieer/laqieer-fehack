@@ -104,7 +104,19 @@ User Setting
 		
 	def run(self,arg):
 		self.set_asmmap()
-		pass
+		isUS = self.n.altval(3)
+		symbols = Names()
+		for ea,name in symbols:
+			#self.asmmap.write("%08X\t%s\t%s\t" % (ea, name, GetType(ea)))
+			self.asmmap.write("%08X\t%s\t" % (ea, name))
+			if GetType(ea) is not None: self.asmmap.write(GetType(ea) + '\t')
+			if GetFunctionCmt(ea,1) is not "": self.asmmap.write(GetFunctionCmt(ea,1).replace('\n','. ') + '\t')
+			if GetConstCmt(ea,1) is not "": self.asmmap.write(GetConstCmt(ea,1).replace('\n','. ') + '\t')
+			if GetConstCmt(ea,0) is not "": self.asmmap.write(GetConstCmt(ea,0).replace('\n','. ') + '\t')
+			if isUS:
+				self.asmmap.write('{U}\n')
+			else:
+				self.asmmap.write('{J}\n')
 		self.asmmap.close()
 		
 	# def PLUGIN_ENTRY():
