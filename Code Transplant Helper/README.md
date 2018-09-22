@@ -2,3 +2,4 @@ A IDA plugin to provide you with helpful infomation when transplanting code betw
 
 prerequisite:
 	pip install treelib
+	pip install enum
