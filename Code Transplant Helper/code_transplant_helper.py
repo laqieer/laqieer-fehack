@@ -6,6 +6,7 @@ from idaapi import *
 from treelib import Node, Tree
 from enum import Enum
 import sqlite3
+import json
 
 class XType(Enum):
     data = 0
@@ -28,7 +29,12 @@ class Xref_node:
 
 def get_mirror(ea):
     'find the mirror in the other rom'
-    #TODO: just a place holder now
+    #TODO: free to add datasource
+    if load_dict is not None:
+        if load_dict.has_key("%08X" % ea):
+            return (Name(ea), load_dict["%08X" % ea])
+        if load_dict.has_key("%08x" % ea):
+            return (Name(ea), load_dict["%08x" % ea])
     if conn is not None and c is not None:
         cursor = c.execute("select address2, name2, ratio from results where address = '%08x'" % ea)
         for row in cursor:
@@ -45,7 +51,7 @@ def add_xrefs(ea, type):
         for i in items:
             for xref in XrefsFrom(i, 0):
                 if not tree.contains(hex(xref.to)):
-                    if xref.type != fl_JN and xref.type != fl_JF and xref.type != fl_F and xref.type != dr_O:
+                    if xref.type != fl_JN and xref.type != fl_JF and xref.type != fl_F and xref.type != dr_O and ((xref.to >= 0x2000000 and xref.to < 0x4000000) or (xref.to >= 0x8000000 and xref.to < 0xA000000)):
                         name = Name(xref.to)
                         if xref.type == fl_CN or xref.type == fl_CF:
                             xType = XType.code
@@ -64,11 +70,15 @@ def add_xrefs(ea, type):
         #TODO: Handle PROC
         
         for xref in DataRefsFrom(ea):
-            if not tree.contains(hex(xref)):
-                name = Name(xref)
-                xType = XType.data
-                mirror = get_mirror(xref)
-                tree.create_node(name, hex(xref), parent=hex(ea), data=Xref_node(name, hex(xref), xType, mirror))
+            if (xref >= 0x2000000 and xref < 0x4000000) or (xref >= 0x8000000 and xref < 0xA000000):
+                if not tree.contains(hex(xref)):
+                    name = Name(xref)
+                    xType = XType.data
+                    mirror = get_mirror(xref)
+                    tree.create_node(name, hex(xref), parent=hex(ea), data=Xref_node(name, hex(xref), xType, mirror))
+            else:
+                tree.remove_node(hex(ea))
+                break
     return
 
 root = get_func(here())
@@ -80,12 +90,27 @@ if not root is None:
     if filename is not None:
         conn = sqlite3.connect(filename)
         c = conn.cursor()
+    filename = AskFile(0, "*.json", "Select extra knowledge to load mirror infomation")
+    if filename is not None:
+        with open(filename,'r') as load_f:
+            load_dict = json.load(load_f)
     mirror = get_mirror(root.startEA)
     tree.create_node(fname, hex(root.startEA), data=Xref_node(fname, hex(root.startEA), XType.code, mirror))
     if mirror == fname:
         add_xrefs(root.startEA, XType.code)
+    Message("Reference Tree:\n\n")
     tree.show(line_type="ascii-em", idhidden=False, data_property='mirror')
-    Message("%d subroutines in routine %s need transplanting.\n" % (Xref_node.xrefTrans - 1, fname))
+    Message("Unique references:\n")
+    for node in tree.all_nodes_itr():
+        if type(node.data.mirror) is str:
+            print node.identifier
+    #hierarchical output
+    for level in range(1, tree.depth()):
+        Message("\nLevel %d: %d\n" % (level, tree.size(level)))
+        for node in tree.all_nodes():
+            if tree.level(node.identifier) == level and type(node.data.mirror) is str:
+                print node.identifier
+    Message("\n%d subroutines in routine %s need transplanting.\n" % (Xref_node.xrefTrans - 1, fname))
     conn.close()
 else:
     Warning("No function found at location %x" % here())
