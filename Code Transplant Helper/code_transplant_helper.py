@@ -23,7 +23,7 @@ class Xref_node:
         self.xType = xType
         self.mirror = mirror
         #Xref_node.xrefCount += 1
-        if mirror != name and xType != XType.data:
+        if type(mirror) is str and xType != XType.data:
             Xref_node.xrefTrans += 1
 
 def get_mirror(ea):
