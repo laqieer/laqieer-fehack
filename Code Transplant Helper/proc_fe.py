@@ -76,6 +76,7 @@ def make_all_procs():
     proc_list = get_all_procs()
     for proc_addr in proc_list:
         make_proc(proc_addr)
+        
 def get_all_functions_in_proc(ea):
     """
     Get all functions in a proc
@@ -89,5 +90,20 @@ def get_all_functions_in_proc(ea):
                 functions.append(func)
     return functions
 
+def make_all_functions_in_proc(ea):
+    """
+    Make all functions in a proc
+    """
+    for func in get_all_functions_in_proc(ea):
+        MakeFunction(func)
+        
+def make_all_functions_in_all_procs():
+    """
+    Make all functions in all procs
+    """
+    for proc in get_all_procs():
+        make_all_functions_in_proc(proc)
+        
 #show_procs_info()
 #make_all_procs()
+#make_all_functions_in_all_procs()
