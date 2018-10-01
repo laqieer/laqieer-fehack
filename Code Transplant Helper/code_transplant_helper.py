@@ -7,6 +7,7 @@ from treelib import Node, Tree
 from enum import Enum
 import sqlite3
 import json
+from proc_fe import *
 
 class XType(Enum):
     data = 0
@@ -57,8 +58,6 @@ def add_xrefs(ea, type):
                             xType = XType.code
                         else:
                             if xref.type == dr_R or xref.type == dr_W:
-                                #TODO: Recoginze PROC
-                                
                                 xType = XType.data
                                 
                         mirror = get_mirror(xref.to)
@@ -67,7 +66,14 @@ def add_xrefs(ea, type):
                         if mirror == Name(xref.to):
                             add_xrefs(xref.to, xType)
     else:
-        #TODO: Handle PROC
+        if ea in procs:
+            for func in get_all_functions_in_proc(ea):
+                name = Name(func)
+                mirror = get_mirror(func)
+                tree.create_node(name, hex(long(func)), parent=hex(ea), data=Xref_node(name, hex(func), XType.proc, mirror))
+                if mirror == Name(func):
+                    add_xrefs(func, XType.code)
+            return                    
         
         for xref in DataRefsFrom(ea):
             if (xref >= 0x2000000 and xref < 0x4000000) or (xref >= 0x8000000 and xref < 0xA000000):
@@ -76,6 +82,8 @@ def add_xrefs(ea, type):
                     xType = XType.data
                     mirror = get_mirror(xref)
                     tree.create_node(name, hex(xref), parent=hex(ea), data=Xref_node(name, hex(xref), xType, mirror))
+                    if xref in procs:
+                        add_xrefs(xref, XType.data)
             else:
                 tree.remove_node(hex(ea))
                 break
@@ -95,6 +103,7 @@ if not root is None:
         with open(filename,'r') as load_f:
             load_dict = json.load(load_f)
     mirror = get_mirror(root.startEA)
+    procs = get_all_procs()
     tree.create_node(fname, hex(root.startEA), data=Xref_node(fname, hex(root.startEA), XType.code, mirror))
     if mirror == fname:
         add_xrefs(root.startEA, XType.code)
