@@ -5,5 +5,5 @@
 struct proc {
 	unsigned short code;
 	unsigned short sarg;
-	unsigned short larg;
+	unsigned int larg;
 };

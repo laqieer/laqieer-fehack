@@ -84,7 +84,7 @@ def get_all_functions_in_proc(ea):
     functions = []
     end = get_end_addr(ea)
     for addr in range (ea, end, 4):
-        if get_dword(addr) == 2 or get_dword(addr) == 3:
+        if get_dword(addr) in (2, 3, 4):
             func = get_dword(addr + 4) & 0x9FFFFFE
             if func not in functions:
                 functions.append(func)
@@ -103,7 +103,29 @@ def make_all_functions_in_all_procs():
     """
     for proc in get_all_procs():
         make_all_functions_in_proc(proc)
+
+def name_proc(ea):
+    """
+    Name a proc
+    """
+    if get_dword(ea) == 1:
+        set_name(ea, "proc_%s" % GetString(get_dword(ea+4)))
+
+def name_all_procs(ea):
+    """
+    Name all procs in the game
+    """
+    for proc in get_all_procs():
+        name_proc(proc)
+
+def main():
+    procs = get_all_procs()
+    print "%d procs in total: from 0x%X to 0x%X" % (len(procs), min(procs), max(procs))
+    for proc in procs:
+        name_proc(proc)
+        make_proc(proc)
+        make_all_functions_in_proc(proc)
+
+if __name__ == "__main__":
+    main()
         
-#show_procs_info()
-#make_all_procs()
-#make_all_functions_in_all_procs()
